@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BOW AND ARROW
+    </title>
+    <style>
+      canvas {
+        border: 1px solid #d3d3d3;
+        background-color: #f1f1f1;
+      }
+      div {
+        float: right;
+        display : inline;
+      }
+	  
+    </style>
+  </head>
+  <body  onload="startGame()">
+    <div>
+      <h4>
+        <h2 style="color : green">Game Rules:-
+        </h2>
+        <h4 style="color: red">You have 3 chances, Try to hit maximum score
+        </h4>
+        <h4 style="color: red" >UP and DOWN keys >> bow up and down
+        </h4>
+        <h4 style="color: red">"SHOOT" or SPACEBAR >> shoot arrows
+        </h4>
+        <h4 style="color: red"> red >> +200
+        </h4>
+        <h4 style="color: red">green >> +150
+        </h4>
+        <h4 style="color: red">blue >> +100
+        </h4>
+        </div>
+      <table style="width:20% " border="2px solid black">
+        <tr>
+          <th id="n1">score
+          </th>
+          <th id="n2" >0
+          </th> 
+        </tr>
+      </table>
+      <button onclick="reload()">RESTART
+      </button>
+      <button onclick="pauseresume()">PAUSE/RESUME
+      </button>
+      <button onclick="arrowreleasef()">SHOOT
+      </button>
+      <script>
+        var targetred,targetgreen1,targetgreen2,targetblue1,targetblue2,bow1,bow2,arrow1,arrow2,arrow3,obstacle1,obstacle2,myMusic;
+        var dy=4,dy1=2,a=0,i=1;
+        var score=0, release=false,pause=false;
+		 
+        function startGame() {
+          myGameArea.start();
+          myMusic = new sound("ringtone.mp3");
+          myMusic.play();
+          r = new component(7,40,"red",493,180);
+          g1 = new component(7,20,"green",493,160);
+          g2 = new component(7,20,"green",493,220);
+          b1 = new component(7,20,"blue",493,140);
+          b2 = new component(7,20,"blue",493,240);
+          bow = new component(7,60,"black",0,160);
+          arrow1 = new component2(70,200,70);
+          arrow2 = new component2(70,200,70);
+          arrow3 = new component2(70,200,70);
+          obstacle = new component(25,25,"brown",200,300);
+         
+        }
+		 var myGameArea = {
+          canvas : document.createElement("canvas"),
+          start : function() {
+            this.canvas.width = 500;
+            this.canvas.height = 500;
+            this.context = this.canvas.getContext("2d");
+            document.body.insertBefore(this.canvas, document.body.childNodes[2]);
+            this.interval = setInterval(updateGameArea, 20);
+            window.addEventListener('keydown', function (e) {
+              myGameArea.key = e.keyCode;
+            }
+                                   )
+            window.addEventListener('keyup', function (e) {
+              myGameArea.key = false;
+            }
+                                   )
+            window.addEventListener('keypress', function (e) {
+              myGameArea.key1 = e.keyCode;
+            }
+                                   )
+          }
+          ,
+		  
+          clear : function() {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          }
+        }
+		
+        function component(width, height, color, x, y) {
+          this.width = width;
+          this.height = height;
+          this.x = x;
+          this.y = y;
+          this.update = function(){
+            ctx = myGameArea.context;
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+          }
+          this.newPos = function() {
+            this.y += this.speedY;
+          }
+        }
+		
+        function component2(x,y,length){
+          this.x = x;
+          this.y = y;
+          this.length = length;
+          this.update = function(){
+            ctx = myGameArea.context;
+            ctx.beginPath();
+            ctx.moveTo(this.x-this.length,this.y);
+            ctx.lineTo(this.x,this.y);
+            ctx.lineTo(this.x-5,this.y-3);
+            ctx.moveTo(this.x-5,this.y+3);
+            ctx.lineTo(this.x,this.y);
+            ctx.stroke();
+            ctx.closePath();
+          }
+          this.newPosY = function() {
+            this.y += this.speedY;
+          }
+          this.newPosX = function() {
+            if(pause==false){
+              this.x += this.speedX;
+            }
+          }
+        }
+		
+        function sound(src) {
+          this.sound = document.createElement("audio");
+          this.sound.src = src;
+          this.sound.setAttribute("preload", "auto");
+          this.sound.setAttribute("controls", "none");
+          this.sound.style.display = "none";
+          document.body.appendChild(this.sound);
+          this.play = function(){
+            this.sound.play();
+          }
+          this.stop = function(){
+            this.sound.pause();
+          }
+        }
+		
+        function updateGameArea() {
+          if(((b2.y+20)>=500)||((b1.y)<=0)){
+            dy=-dy;
+          }
+          if(((obstacle.y)>=500)||((obstacle.y)<=0)){
+            dy1=-dy1;
+          }
+          myGameArea.clear();
+          if(score<=2){
+            r.y+=dy;
+            g1.y+= dy;
+            g2.y+= dy;
+            b1.y+= dy;
+            b2.y+= dy;
+            obstacle.y+= dy1;
+          
+          }
+          console.log(score,i);
+          arrow1.speedX = 4;
+          arrow2.speedX = 4;
+          arrow3.speedX = 4;
+          bow.speedY = 0;
+          
+          arrow1.speedY = 0;
+          arrow2.speedY = 0;
+          arrow3.speedY = 0;
+          if(bow.y>=0){
+            if (myGameArea.key && myGameArea.key == 38)
+            {
+              bow.speedY = -3;
+              
+              if(i==1){
+                arrow1.speedY = -3;
+                arrow2.speedY = -3;
+                arrow3.speedY = -3;
+              }
+              else if(i==2){
+                arrow2.speedY = -3;
+                arrow3.speedY = -3;
+              }
+              else if(i==3){
+                arrow3.speedY = -3;
+              }
+            }
+          }
+          if((bow.y)<=600){
+            if (myGameArea.key && myGameArea.key == 40) 
+            {
+              bow.speedY = 3;
+              
+              if(i==1){
+                arrow1.speedY = 3;
+                arrow2.speedY = 3;
+                arrow3.speedY = 3;
+              }
+              else if(i==2){
+                arrow2.speedY = 3;
+                arrow3.speedY = 3;
+              }
+              else if(i==3){
+                arrow3.speedY = 3;
+              }
+            }
+          }
+
+          r.update();
+          g1.update();
+          g2.update();
+          b1.update();
+          b2.update();
+          bow.update();
+          
+          if(arrow1.x<=493){
+            arrow1.update();
+          }
+          if(arrow2.x<=493){
+            arrow2.update();
+          }
+          if(arrow3.x<=493){
+            arrow3.update();
+          }
+          obstacle.update();
+          
+          bow.newPos();
+          
+          arrow1.newPosY();
+          arrow2.newPosY();
+          arrow3.newPosY();
+          scorefunction();
+          if(score==3){
+            myMusic.stop();
+          }
+        }
+        var myVar1 = function arrowrelease1(){
+          arrow1.newPosX();
+        }
+        var myVar2 = function arrowrelease2(){
+          arrow2.newPosX();
+        }
+        var myVar3 = function arrowrelease3(){
+          arrow3.newPosX();
+        }
+        function arrowreleasef(){
+          if(i==1){
+            setInterval(myVar1,10);
+            i++;
+          }
+          else if(i==2){
+            setInterval(myVar2,10);
+            i++;
+          }
+          else if(i==3){
+            setInterval(myVar3,10);
+            i++;
+          }
+        }
+		document.body.onkeyup = function(){
+		if (myGameArea.key1 && myGameArea.key1 == 32) 
+          {
+            arrowreleasef();
+          }}
+		  
+        function scorefunction(){
+          if(i==2){
+            if(score==0&&(arrow1.x>=493)&&(arrow1.y>=r.y)&&(arrow1.y<=(r.y+40)))
+            {
+              score=1;
+              a+=200;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==0&&(arrow1.x>=493)&&(((arrow1.y>=g1.y)&&(arrow1.y<=(g1.y+20)))||((arrow1.y>=g2.y)&&(arrow1.y<=(g2.y+20)))))
+            {
+              score=1;
+              a+=150;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==0&&(arrow1.x>=493)&&(((arrow1.y>=b1.y)&&(arrow1.y<=(b1.y+20)))||((arrow1.y>=b2.y)&&(arrow1.y<=(b2.y+20)))))
+            {
+              score=1;
+              a+=100;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==0&&(arrow1.x>=493)&&((arrow1.y<=b1.y)||(arrow1.y>=(b2.y+20))))
+            {
+              score=1;
+              a+=0;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==0&&(arrow1.x>=200 && arrow1.x<=225 && arrow1.y>=obstacle.y && arrow1.y<=(obstacle.y+25))){
+              alert("GAME OVER Your score is"+a);
+              reload();
+            }
+          }
+          if(i==3){
+            if(score==1&&(arrow2.x>=493)&&(arrow2.y>=r.y)&&(arrow2.y<=(r.y+40)))
+            {
+              score=2;
+              a+=200;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==1&&(arrow2.x>=493)&&(((arrow2.y>=g1.y)&&(arrow2.y<=(g1.y+20)))||((arrow2.y>=g2.y)&&(arrow2.y<=(g2.y+20)))))
+            {
+              score=2;
+              a+=150;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==1&&(arrow2.x>=493)&&(((arrow2.y>=b1.y)&&(arrow2.y<=(b1.y+20)))||((arrow2.y>=b2.y)&&(arrow2.y<=(b2.y+20)))))
+            {
+              score=2;
+              a+=150;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==1&&(arrow2.x>=493)&&((arrow2.y<=b1.y)||(arrow2.y>=(b2.y+20))))
+            {
+              score=2;
+              a+=0;
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==1&&(arrow2.x>=200 && arrow2.x<=225 && arrow2.y>=obstacle.y && arrow2.y<=(obstacle.y+25)))
+            {
+              alert("GAME OVER Your score is"+a);
+              reload();
+            }
+          }
+          if(i==4){
+            if(score==2&&(arrow3.x>=493)&&(arrow3.y>=r.y)&&(arrow3.y<=(r.y+40)))
+            {
+              score=3;
+              a+=200;
+              alert("GAME OVER Your score is"+a);
+              reload();
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==2&&(arrow3.x>=493)&&(((arrow3.y>=g1.y)&&(arrow3.y<=(g1.y+20)))||((arrow3.y>=g2.y)&&(arrow3.y<=(g2.y+20)))))
+            {
+              score=3;
+              a+=150;
+              alert("GAME OVER Your score is"+a);
+              reload();
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==2&&(arrow3.x>=493)&&(((arrow3.y>=b1.y)&&(arrow3.y<=(b1.y+20)))||((arrow3.y>=b2.y)&&(arrow3.y<=(b2.y+20)))))
+            {
+              score=3;
+              a+=100;
+              alert("GAME OVER Your score is"+a);
+              reload();
+              document.getElementById("n2").innerHTML = a;
+            }
+            else if(score==2&&(arrow3.x>=200 && arrow3.x<=225 && arrow3.y>=obstacle.y && arrow3.y<=(obstacle.y+25))||((arrow3.x>=593)&&((arrow3.y<=targetblue.y)||(arrow3.y>=(targetblue2.y+20))))){
+              score=3;
+              alert("GAME OVER Your score is"+a);
+              reload();
+            }
+          }
+        }
+		
+        function reload(){
+          document.location.reload();
+        }
+		 
+        function pauseresume(){
+          if(pause==false){
+            myMusic.stop();
+            pause=true;
+            clearInterval(myGameArea.interval);
+          }
+          else if(pause==true){
+            myMusic.play();
+            pause=false;
+            myGameArea.start();
+          }
+        }
+      </script>
+    </body>
+</html>
